@@ -57,9 +57,9 @@
 
                 <div class="flex shrink-0 items-center gap-2 sm:gap-3">
                     @auth
-                        <a href="{{ route('profile.edit') }}" class="hidden rounded-full px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 sm:inline-flex">Akun saya</a>
+                        <a href="{{ route('dashboard') }}" class="rounded-full bg-rose-700 px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-rose-700/15 transition hover:bg-rose-800">Dashboard</a>
                     @else
-                        <a href="{{ route('login') }}" class="hidden rounded-full border border-slate-200 px-4 py-2 text-sm font-bold text-slate-700 transition hover:border-rose-200 hover:text-rose-700 sm:inline-flex">Masuk</a>
+                        <a href="{{ route('login') }}" class="rounded-full border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:border-rose-200 hover:text-rose-700">Login</a>
                     @endauth
 
                     <div class="relative">
@@ -95,9 +95,11 @@
                     <a href="{{ route('home') }}" @click="mobileMenuOpen = false" class="rounded-xl px-3 py-2.5 text-rose-700 hover:bg-rose-50">Beranda</a>
                     <a href="{{ route('home') }}#produk-terbaru" @click="mobileMenuOpen = false" class="rounded-xl px-3 py-2.5 hover:bg-slate-50">Produk terbaru</a>
                     <a href="{{ route('home') }}#produk-terbaru" @click="mobileMenuOpen = false" class="rounded-xl px-3 py-2.5 hover:bg-slate-50">Kategori produk</a>
-                    @guest
-                        <a href="{{ route('login') }}" class="rounded-xl px-3 py-2.5 hover:bg-slate-50">Masuk ke akun</a>
-                    @endguest
+                    @auth
+                        <a href="{{ route('dashboard') }}" @click="mobileMenuOpen = false" class="rounded-xl px-3 py-2.5 text-rose-700 hover:bg-rose-50">Dashboard admin</a>
+                    @else
+                        <a href="{{ route('login') }}" @click="mobileMenuOpen = false" class="rounded-xl px-3 py-2.5 hover:bg-slate-50">Login</a>
+                    @endauth
                 </div>
             </nav>
         </header>
