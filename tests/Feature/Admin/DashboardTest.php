@@ -8,7 +8,7 @@ it('redirects guests to sign in', function () {
     $response->assertRedirect(route('login'));
 });
 
-it('renders the admin dashboard with the registered user total', function () {
+it('renders the admin dashboard with the available demo totals', function () {
     $user = User::factory()->create();
 
     $response = $this->actingAs($user)->get(route('dashboard'));
@@ -17,10 +17,15 @@ it('renders the admin dashboard with the registered user total', function () {
         ->assertOk()
         ->assertViewIs('pages.admin.dashboard.index')
         ->assertViewHas('categoryCount', 8)
-        ->assertViewHas('userCount', 128)
+        ->assertViewHas('productCount', 2)
+        ->assertViewHas('transactionCount', 5)
+        ->assertViewHas('userCount', 3)
         ->assertSee('Selamat datang kembali')
         ->assertSee('Kategori')
         ->assertSee('Produk')
         ->assertSee('Transaksi')
-        ->assertSee('User');
+        ->assertSee('User')
+        ->assertSee('href="'.route('admin.products.index').'"', false)
+        ->assertSee('href="'.route('admin.transactions.index').'"', false)
+        ->assertSee('href="'.route('admin.users.index').'"', false);
 });

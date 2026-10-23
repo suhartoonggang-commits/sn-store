@@ -86,23 +86,41 @@
                     @endif
                 </a>
 
-                <span aria-disabled="true" title="Modul produk segera tersedia" class="flex cursor-not-allowed items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-semibold text-slate-400">
+                <a href="{{ route('admin.products.index') }}" @click="sidebarOpen = false" @if (request()->routeIs('admin.products.*')) aria-current="page" @endif @class([
+                    'flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm transition',
+                    'bg-rose-50 font-bold text-rose-800 ring-1 ring-inset ring-rose-100' => request()->routeIs('admin.products.*'),
+                    'font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900' => ! request()->routeIs('admin.products.*'),
+                ])>
                     <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8.5 12 4l8 4.5v9L12 22l-8-4.5v-9Z" /><path stroke-linecap="round" stroke-linejoin="round" d="m4.3 8.7 7.7 4.4 7.7-4.4M12 13.1V22" /></svg>
                     <span class="flex-1">Produk</span>
-                    <span class="rounded-md bg-slate-100 px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wide text-slate-400">Segera</span>
-                </span>
+                    @if (request()->routeIs('admin.products.*'))
+                        <span class="size-1.5 rounded-full bg-rose-600"></span>
+                    @endif
+                </a>
 
-                <span aria-disabled="true" title="Modul transaksi segera tersedia" class="flex cursor-not-allowed items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-semibold text-slate-400">
+                <a href="{{ route('admin.transactions.index') }}" @click="sidebarOpen = false" @if (request()->routeIs('admin.transactions.*')) aria-current="page" @endif @class([
+                    'flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm transition',
+                    'bg-rose-50 font-bold text-rose-800 ring-1 ring-inset ring-rose-100' => request()->routeIs('admin.transactions.*'),
+                    'font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900' => ! request()->routeIs('admin.transactions.*'),
+                ])>
                     <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 4h14a1 1 0 0 1 1 1v15l-3-2-3 2-3-2-3 2-3-2-2 2V5a1 1 0 0 1 1-1Z" /><path stroke-linecap="round" d="M8 9h8M8 13h5" /></svg>
                     <span class="flex-1">Transaksi</span>
-                    <span class="rounded-md bg-slate-100 px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wide text-slate-400">Segera</span>
-                </span>
+                    @if (request()->routeIs('admin.transactions.*'))
+                        <span class="size-1.5 rounded-full bg-rose-600"></span>
+                    @endif
+                </a>
 
-                <span aria-disabled="true" title="Modul pengguna segera tersedia" class="flex cursor-not-allowed items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-semibold text-slate-400">
+                <a href="{{ route('admin.users.index') }}" @click="sidebarOpen = false" @if (request()->routeIs('admin.users.*')) aria-current="page" @endif @class([
+                    'flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm transition',
+                    'bg-rose-50 font-bold text-rose-800 ring-1 ring-inset ring-rose-100' => request()->routeIs('admin.users.*'),
+                    'font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900' => ! request()->routeIs('admin.users.*'),
+                ])>
                     <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="9" cy="8" r="3.5" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.8 20a6.2 6.2 0 0 1 12.4 0M16 5a3.5 3.5 0 0 1 0 6.8M17.5 14a5.5 5.5 0 0 1 3.7 5.2" /></svg>
                     <span class="flex-1">User</span>
-                    <span class="rounded-md bg-slate-100 px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wide text-slate-400">Segera</span>
-                </span>
+                    @if (request()->routeIs('admin.users.*'))
+                        <span class="size-1.5 rounded-full bg-rose-600"></span>
+                    @endif
+                </a>
             </nav>
 
             <div class="border-t border-slate-100 p-4">

@@ -19,7 +19,7 @@
                     Selamat datang kembali, {{ auth()->user()->name }}.
                 </h1>
                 <p class="mt-3 max-w-xl text-sm leading-6 text-rose-100/90 sm:text-base">
-                    Pantau toko dan kelola kebutuhan SN Store dari satu tempat. Modul pengelolaan lainnya sedang disiapkan.
+                    Pantau katalog, pembayaran, transaksi, dan pengguna SN Store dari satu tempat. Data modul saat ini merupakan pratinjau.
                 </p>
             </div>
 
@@ -45,11 +45,11 @@
                     <span class="grid size-11 place-items-center rounded-xl bg-rose-50 text-rose-700">
                         <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8.5 12 4l8 4.5v9L12 22l-8-4.5v-9Z" /><path stroke-linecap="round" stroke-linejoin="round" d="m4.3 8.7 7.7 4.4 7.7-4.4M12 13.1V22" /></svg>
                     </span>
-                    <span class="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold text-slate-500">Segera tersedia</span>
+                    <span class="rounded-full bg-amber-50 px-2.5 py-1 text-[10px] font-bold text-amber-700">Data demo</span>
                 </div>
-                <p class="mt-5 text-sm font-semibold text-slate-500">Produk aktif</p>
-                <p class="mt-1 text-3xl font-extrabold tracking-tight text-slate-900">—</p>
-                <p class="mt-2 text-xs text-slate-400">Data katalog belum terhubung</p>
+                <p class="mt-5 text-sm font-semibold text-slate-500">Produk terjual</p>
+                <p class="mt-1 text-3xl font-extrabold tracking-tight text-slate-900">{{ number_format($productCount, 0, ',', '.') }}</p>
+                <p class="mt-2 text-xs text-slate-400">Produk dengan pembayaran lunas (demo)</p>
             </article>
 
             <article class="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-slate-900/[0.02]">
@@ -57,11 +57,11 @@
                     <span class="grid size-11 place-items-center rounded-xl bg-amber-50 text-amber-600">
                         <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m12 3 8.5 4.5v9L12 21l-8.5-4.5v-9L12 3Z" /><path stroke-linecap="round" stroke-linejoin="round" d="m3.8 7.7 8.2 4.5 8.2-4.5M12 12.2V21" /></svg>
                     </span>
-                    <span class="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold text-emerald-700">Data terdaftar</span>
+                    <span class="rounded-full bg-amber-50 px-2.5 py-1 text-[10px] font-bold text-amber-700">Data contoh</span>
                 </div>
                 <p class="mt-5 text-sm font-semibold text-slate-500">Kategori</p>
                 <p class="mt-1 text-3xl font-extrabold tracking-tight text-slate-900">{{ number_format($categoryCount, 0, ',', '.') }}</p>
-                <p class="mt-2 text-xs text-slate-400">Kategori produk terdaftar</p>
+                <p class="mt-2 text-xs text-slate-400">Kategori produk contoh</p>
             </article>
 
             <article class="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-slate-900/[0.02]">
@@ -69,11 +69,11 @@
                     <span class="grid size-11 place-items-center rounded-xl bg-sky-50 text-sky-700">
                         <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 4h14a1 1 0 0 1 1 1v15l-3-2-3 2-3-2-3 2-3-2-2 2V5a1 1 0 0 1 1-1Z" /><path stroke-linecap="round" d="M8 9h8M8 13h5" /></svg>
                     </span>
-                    <span class="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold text-slate-500">Segera tersedia</span>
+                    <span class="rounded-full bg-amber-50 px-2.5 py-1 text-[10px] font-bold text-amber-700">Data demo</span>
                 </div>
-                <p class="mt-5 text-sm font-semibold text-slate-500">Transaksi hari ini</p>
-                <p class="mt-1 text-3xl font-extrabold tracking-tight text-slate-900">—</p>
-                <p class="mt-2 text-xs text-slate-400">Data transaksi belum terhubung</p>
+                <p class="mt-5 text-sm font-semibold text-slate-500">Transaksi contoh</p>
+                <p class="mt-1 text-3xl font-extrabold tracking-tight text-slate-900">{{ number_format($transactionCount, 0, ',', '.') }}</p>
+                <p class="mt-2 text-xs text-slate-400">Transaksi contoh ditampilkan</p>
             </article>
 
             <article class="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-slate-900/[0.02]">
@@ -99,7 +99,7 @@
                 </div>
                 <span class="inline-flex items-center gap-2 rounded-full bg-amber-50 px-3 py-1.5 text-[10px] font-bold text-amber-700">
                     <span class="size-1.5 rounded-full bg-amber-500"></span>
-                    Menunggu data transaksi
+                    Data contoh
                 </span>
             </div>
 
@@ -116,7 +116,7 @@
                             <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4 19V5m0 14h17M7 15l4-4 3 2 5-6" /><path stroke-linecap="round" stroke-linejoin="round" d="M16 7h3v3" /></svg>
                         </span>
                         <p class="mt-3 text-sm font-bold text-slate-700">Belum ada aktivitas untuk ditampilkan</p>
-                        <p class="mt-1 text-xs leading-5 text-slate-500">Grafik akan terisi saat modul transaksi mulai digunakan.</p>
+                        <p class="mt-1 text-xs leading-5 text-slate-500">Grafik akan terisi setelah sumber data transaksi nyata terhubung.</p>
                     </div>
                 </div>
                 <div class="absolute inset-x-4 bottom-3 flex justify-between text-[10px] font-semibold text-slate-400 sm:inset-x-6" aria-hidden="true">
@@ -128,36 +128,42 @@
         <section class="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-slate-900/[0.02] sm:p-6" aria-labelledby="modules-heading">
             <div>
                 <h2 id="modules-heading" class="text-base font-extrabold tracking-tight text-slate-900">Modul pengelolaan</h2>
-                <p class="mt-1 text-xs text-slate-500">Fitur yang akan hadir di panel admin</p>
+                <p class="mt-1 text-xs text-slate-500">Pratinjau modul yang tersedia</p>
             </div>
 
             <ul class="mt-5 divide-y divide-slate-100">
-                <li class="flex items-center gap-3 py-3 first:pt-0">
+                <li class="py-3 first:pt-0">
+                    <a href="{{ route('admin.products.index') }}" class="flex items-center gap-3 rounded-lg transition hover:bg-slate-50">
                     <span class="grid size-9 place-items-center rounded-lg bg-rose-50 text-rose-700">
                         <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m12 3 8.5 4.5v9L12 21l-8.5-4.5v-9L12 3Z" /></svg>
                     </span>
-                    <span class="flex-1 text-sm font-semibold text-slate-700">Kategori &amp; produk</span>
-                    <span class="size-2 rounded-full bg-slate-300" aria-label="Dalam persiapan"></span>
+                    <span class="flex-1 text-sm font-semibold text-slate-700">Produk berdasarkan kategori</span>
+                    <span class="size-2 rounded-full bg-emerald-500" aria-label="Aktif"></span>
+                    </a>
                 </li>
-                <li class="flex items-center gap-3 py-3">
+                <li class="py-3">
+                    <a href="{{ route('admin.transactions.index') }}" class="flex items-center gap-3 rounded-lg transition hover:bg-slate-50">
                     <span class="grid size-9 place-items-center rounded-lg bg-sky-50 text-sky-700">
                         <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 4h14a1 1 0 0 1 1 1v15l-3-2-3 2-3-2-3 2-3-2-2 2V5a1 1 0 0 1 1-1Z" /></svg>
                     </span>
                     <span class="flex-1 text-sm font-semibold text-slate-700">Transaksi</span>
-                    <span class="size-2 rounded-full bg-slate-300" aria-label="Dalam persiapan"></span>
+                    <span class="size-2 rounded-full bg-emerald-500" aria-label="Aktif"></span>
+                    </a>
                 </li>
-                <li class="flex items-center gap-3 py-3 last:pb-0">
+                <li class="py-3 last:pb-0">
+                    <a href="{{ route('admin.users.index') }}" class="flex items-center gap-3 rounded-lg transition hover:bg-slate-50">
                     <span class="grid size-9 place-items-center rounded-lg bg-emerald-50 text-emerald-700">
                         <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="9" cy="8" r="3.5" /><path stroke-linecap="round" d="M2.8 20a6.2 6.2 0 0 1 12.4 0M16 5a3.5 3.5 0 0 1 0 6.8M17.5 14a5.5 5.5 0 0 1 3.7 5.2" /></svg>
                     </span>
-                    <span class="flex-1 text-sm font-semibold text-slate-700">Pengguna</span>
-                    <span class="size-2 rounded-full bg-slate-300" aria-label="Dalam persiapan"></span>
+                    <span class="flex-1 text-sm font-semibold text-slate-700">Pengguna &amp; riwayat</span>
+                    <span class="size-2 rounded-full bg-emerald-500" aria-label="Aktif"></span>
+                    </a>
                 </li>
             </ul>
 
             <div class="mt-5 rounded-xl bg-rose-50/80 p-4">
                 <p class="text-xs font-bold text-rose-900">Satu langkah dalam satu waktu</p>
-                <p class="mt-1 text-xs leading-5 text-rose-800/80">Dashboard admin sudah siap. Pengelolaan katalog dan pesanan dapat ditambahkan bertahap.</p>
+                <p class="mt-1 text-xs leading-5 text-rose-800/80">Halaman modul memakai data contoh dan belum membaca database atau payment gateway.</p>
             </div>
         </section>
     </div>
