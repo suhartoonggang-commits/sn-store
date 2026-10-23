@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use Database\Seeders\RolePermissionSeeder;
 
 it('redirects guests to sign in', function () {
     $response = $this->get(route('admin.categories.index'));
@@ -9,7 +10,9 @@ it('redirects guests to sign in', function () {
 });
 
 it('shows dummy product categories without a categories table', function () {
+    $this->seed(RolePermissionSeeder::class);
     $user = User::factory()->create();
+    $user->assignRole('admin');
 
     $response = $this->actingAs($user)->get(route('admin.categories.index'));
 
@@ -31,7 +34,9 @@ it('shows dummy product categories without a categories table', function () {
 });
 
 it('links to categories from the admin sidebar', function () {
+    $this->seed(RolePermissionSeeder::class);
     $user = User::factory()->create();
+    $user->assignRole('admin');
 
     $response = $this->actingAs($user)->get(route('dashboard'));
 

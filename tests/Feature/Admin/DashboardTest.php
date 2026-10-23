@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use Database\Seeders\RolePermissionSeeder;
 
 it('redirects guests to sign in', function () {
     $response = $this->get(route('dashboard'));
@@ -9,7 +10,9 @@ it('redirects guests to sign in', function () {
 });
 
 it('renders the admin dashboard with the available demo totals', function () {
+    $this->seed(RolePermissionSeeder::class);
     $user = User::factory()->create();
+    $user->assignRole('admin');
 
     $response = $this->actingAs($user)->get(route('dashboard'));
 

@@ -57,8 +57,17 @@
 
                 <div class="flex shrink-0 items-center gap-2 sm:gap-3">
                     @auth
-                        <a href="{{ route('dashboard') }}" class="rounded-full bg-rose-700 px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-rose-700/15 transition hover:bg-rose-800">Dashboard</a>
+                        @can('dashboard.view')
+                            <a href="{{ route('dashboard') }}" class="rounded-full bg-rose-700 px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-rose-700/15 transition hover:bg-rose-800">Dashboard</a>
+                        @else
+                            <a href="{{ route('profile.edit') }}" class="rounded-full bg-rose-700 px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-rose-700/15 transition hover:bg-rose-800">Akun saya</a>
+                        @endcan
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="rounded-full border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:border-rose-200 hover:text-rose-700">Logout</button>
+                        </form>
                     @else
+                        <a href="{{ route('register') }}" class="hidden rounded-full border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:border-rose-200 hover:text-rose-700 sm:inline-flex">Register</a>
                         <a href="{{ route('login') }}" class="rounded-full border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:border-rose-200 hover:text-rose-700">Login</a>
                     @endauth
 
@@ -96,8 +105,17 @@
                     <a href="{{ route('home') }}#produk-terbaru" @click="mobileMenuOpen = false" class="rounded-xl px-3 py-2.5 hover:bg-slate-50">Produk terbaru</a>
                     <a href="{{ route('home') }}#produk-terbaru" @click="mobileMenuOpen = false" class="rounded-xl px-3 py-2.5 hover:bg-slate-50">Kategori produk</a>
                     @auth
-                        <a href="{{ route('dashboard') }}" @click="mobileMenuOpen = false" class="rounded-xl px-3 py-2.5 text-rose-700 hover:bg-rose-50">Dashboard admin</a>
+                        @can('dashboard.view')
+                            <a href="{{ route('dashboard') }}" @click="mobileMenuOpen = false" class="rounded-xl px-3 py-2.5 text-rose-700 hover:bg-rose-50">Dashboard admin</a>
+                        @else
+                            <a href="{{ route('profile.edit') }}" @click="mobileMenuOpen = false" class="rounded-xl px-3 py-2.5 text-rose-700 hover:bg-rose-50">Akun saya</a>
+                        @endcan
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="w-full rounded-xl px-3 py-2.5 text-left hover:bg-slate-50">Logout</button>
+                        </form>
                     @else
+                        <a href="{{ route('register') }}" @click="mobileMenuOpen = false" class="rounded-xl px-3 py-2.5 hover:bg-slate-50">Register</a>
                         <a href="{{ route('login') }}" @click="mobileMenuOpen = false" class="rounded-xl px-3 py-2.5 hover:bg-slate-50">Login</a>
                     @endauth
                 </div>
@@ -130,7 +148,9 @@
                         <li><a href="{{ route('home') }}" class="transition hover:text-white">Beranda</a></li>
                         <li><a href="{{ route('home') }}#produk-terbaru" class="transition hover:text-white">Produk terbaru</a></li>
                         <li><a href="{{ route('home') }}#tentang-kami" class="transition hover:text-white">Tentang kami</a></li>
-                        <li><a href="{{ route('login') }}" class="transition hover:text-white">Masuk / Daftar</a></li>
+                        @guest
+                            <li><a href="{{ route('login') }}" class="transition hover:text-white">Masuk / Daftar</a></li>
+                        @endguest
                     </ul>
                 </div>
 

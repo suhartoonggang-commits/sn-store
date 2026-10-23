@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use Database\Seeders\RolePermissionSeeder;
 
 it('redirects guests from each admin module', function (string $routeName) {
     $this->get(route($routeName))->assertRedirect(route('login'));
@@ -11,7 +12,9 @@ it('redirects guests from each admin module', function (string $routeName) {
 ]);
 
 it('shows sold products with their categories prices quantities and buyers', function () {
+    $this->seed(RolePermissionSeeder::class);
     $user = User::factory()->create();
+    $user->assignRole('admin');
 
     $response = $this->actingAs($user)->get(route('admin.products.index'));
 
@@ -30,7 +33,9 @@ it('shows sold products with their categories prices quantities and buyers', fun
 });
 
 it('shows payment details and transaction statuses without a gateway connection', function () {
+    $this->seed(RolePermissionSeeder::class);
     $user = User::factory()->create();
+    $user->assignRole('admin');
 
     $response = $this->actingAs($user)->get(route('admin.transactions.index'));
 
@@ -48,7 +53,9 @@ it('shows payment details and transaction statuses without a gateway connection'
 });
 
 it('shows transacting users and their transaction history', function () {
+    $this->seed(RolePermissionSeeder::class);
     $user = User::factory()->create();
+    $user->assignRole('admin');
 
     $response = $this->actingAs($user)->get(route('admin.users.index'));
 

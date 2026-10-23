@@ -132,7 +132,8 @@
             </div>
 
             <ul class="mt-5 divide-y divide-slate-100">
-                <li class="py-3 first:pt-0">
+                @can('products.view')
+                    <li class="py-3 first:pt-0">
                     <a href="{{ route('admin.products.index') }}" class="flex items-center gap-3 rounded-lg transition hover:bg-slate-50">
                     <span class="grid size-9 place-items-center rounded-lg bg-rose-50 text-rose-700">
                         <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m12 3 8.5 4.5v9L12 21l-8.5-4.5v-9L12 3Z" /></svg>
@@ -140,8 +141,10 @@
                     <span class="flex-1 text-sm font-semibold text-slate-700">Produk berdasarkan kategori</span>
                     <span class="size-2 rounded-full bg-emerald-500" aria-label="Aktif"></span>
                     </a>
-                </li>
-                <li class="py-3">
+                    </li>
+                @endcan
+                @can('transactions.view')
+                    <li class="py-3">
                     <a href="{{ route('admin.transactions.index') }}" class="flex items-center gap-3 rounded-lg transition hover:bg-slate-50">
                     <span class="grid size-9 place-items-center rounded-lg bg-sky-50 text-sky-700">
                         <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 4h14a1 1 0 0 1 1 1v15l-3-2-3 2-3-2-3 2-3-2-2 2V5a1 1 0 0 1 1-1Z" /></svg>
@@ -149,8 +152,10 @@
                     <span class="flex-1 text-sm font-semibold text-slate-700">Transaksi</span>
                     <span class="size-2 rounded-full bg-emerald-500" aria-label="Aktif"></span>
                     </a>
-                </li>
-                <li class="py-3 last:pb-0">
+                    </li>
+                @endcan
+                @can('users.view')
+                    <li class="py-3 last:pb-0">
                     <a href="{{ route('admin.users.index') }}" class="flex items-center gap-3 rounded-lg transition hover:bg-slate-50">
                     <span class="grid size-9 place-items-center rounded-lg bg-emerald-50 text-emerald-700">
                         <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="9" cy="8" r="3.5" /><path stroke-linecap="round" d="M2.8 20a6.2 6.2 0 0 1 12.4 0M16 5a3.5 3.5 0 0 1 0 6.8M17.5 14a5.5 5.5 0 0 1 3.7 5.2" /></svg>
@@ -158,7 +163,8 @@
                     <span class="flex-1 text-sm font-semibold text-slate-700">Pengguna &amp; riwayat</span>
                     <span class="size-2 rounded-full bg-emerald-500" aria-label="Aktif"></span>
                     </a>
-                </li>
+                    </li>
+                @endcan
             </ul>
 
             <div class="mt-5 rounded-xl bg-rose-50/80 p-4">
