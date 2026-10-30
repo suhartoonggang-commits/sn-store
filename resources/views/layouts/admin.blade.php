@@ -144,8 +144,9 @@
                     </div>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button type="submit" class="grid size-9 place-items-center rounded-xl text-slate-400 transition hover:bg-white hover:text-rose-700" aria-label="Keluar">
+                        <button type="submit" class="inline-flex shrink-0 items-center gap-2 rounded-xl px-3 py-2 text-xs font-bold text-slate-500 transition hover:bg-white hover:text-rose-700" aria-label="Logout">
                             <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M10 17l5-5-5-5m5 5H3m9-9h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6" /></svg>
+                            <span>Logout</span>
                         </button>
                     </form>
                 </div>

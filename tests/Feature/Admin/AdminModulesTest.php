@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Category;
+use App\Models\Product;
 use App\Models\User;
 use Database\Seeders\RolePermissionSeeder;
 
@@ -11,25 +13,29 @@ it('redirects guests from each admin module', function (string $routeName) {
     'users' => 'admin.users.index',
 ]);
 
-it('shows sold products with their categories prices quantities and buyers', function () {
+it('shows catalog products with their categories prices and stock', function () {
     $this->seed(RolePermissionSeeder::class);
     $user = User::factory()->create();
     $user->assignRole('admin');
+
+    $category = Category::factory()->create(['name' => 'Audio', 'slug' => 'audio']);
+    Product::factory()->for($category)->create([
+        'name' => 'Headphone Wireless Pro',
+        'price' => 850000,
+        'stock' => 12,
+    ]);
 
     $response = $this->actingAs($user)->get(route('admin.products.index'));
 
     $response
         ->assertOk()
         ->assertViewIs('pages.admin.products.index')
-        ->assertViewHas('categories', fn ($categories) => $categories->count() === 8)
-        ->assertViewHas('products', fn ($products) => $products->count() === 2)
+        ->assertViewHas('products', fn ($products) => $products->total() === 1)
         ->assertSee('Headphone Wireless Pro')
-        ->assertSee('Smartphone Nova X')
         ->assertSee('Audio')
         ->assertSee('Rp850.000')
-        ->assertSee('3')
-        ->assertSee('Andi Pratama')
-        ->assertSee('belum tersimpan di database');
+        ->assertSee('12')
+        ->assertSee('Daftar produk');
 });
 
 it('shows payment details and transaction statuses without a gateway connection', function () {

@@ -38,7 +38,7 @@ it('applies least-privilege permissions to the seeded roles', function () {
     $this->seed(RolePermissionSeeder::class);
 
     $this->assertDatabaseCount('roles', 2);
-    $this->assertDatabaseCount('permissions', 13);
+    $this->assertDatabaseCount('permissions', 19);
     $this->assertDatabaseMissing('roles', ['name' => 'super-admin']);
     $this->assertDatabaseMissing('roles', ['name' => 'staff']);
 });

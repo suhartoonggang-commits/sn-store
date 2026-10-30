@@ -12,7 +12,13 @@ class RolePermissionSeeder extends Seeder
     private const PERMISSIONS = [
         'dashboard.view',
         'categories.view',
+        'categories.create',
+        'categories.update',
+        'categories.delete',
         'products.view',
+        'products.create',
+        'products.update',
+        'products.delete',
         'transactions.view',
         'users.view',
         'roles.view',
