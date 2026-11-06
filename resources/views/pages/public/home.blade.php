@@ -4,21 +4,6 @@
 @section('description', 'Belanja gadget dan elektronik pilihan di SN Store. Temukan produk terbaru, harga spesial, dan pengalaman belanja yang nyaman.')
 
 @section('content')
-    @php
-        $products = [
-            ['name' => 'Sony Alpha A6400', 'category' => 'Kamera', 'price' => 'Rp 12.499.000', 'old_price' => 'Rp 13.999.000', 'rating' => '4.9', 'badge' => 'Terlaris', 'image' => 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=900&q=85'],
-            ['name' => 'Headphone Studio Pro', 'category' => 'Audio', 'price' => 'Rp 2.899.000', 'old_price' => 'Rp 3.499.000', 'rating' => '4.8', 'badge' => 'Hemat 17%', 'image' => 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=900&q=85'],
-            ['name' => 'Smartphone Nova X', 'category' => 'Smartphone', 'price' => 'Rp 8.799.000', 'old_price' => 'Rp 9.499.000', 'rating' => '4.9', 'badge' => 'Baru', 'image' => 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?auto=format&fit=crop&w=900&q=85'],
-            ['name' => 'Laptop Air 14', 'category' => 'Laptop', 'price' => 'Rp 14.999.000', 'old_price' => 'Rp 16.499.000', 'rating' => '4.9', 'badge' => 'Favorit', 'image' => 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=900&q=85'],
-            ['name' => 'Smartwatch Active 5', 'category' => 'Wearable', 'price' => 'Rp 3.249.000', 'old_price' => 'Rp 3.799.000', 'rating' => '4.7', 'badge' => 'Hemat 14%', 'image' => 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=900&q=85'],
-            ['name' => 'Speaker Bluetooth Boom', 'category' => 'Audio', 'price' => 'Rp 1.599.000', 'old_price' => 'Rp 1.899.000', 'rating' => '4.8', 'badge' => 'Terlaris', 'image' => 'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?auto=format&fit=crop&w=900&q=85'],
-            ['name' => 'Mechanical Keyboard K87', 'category' => 'Aksesori', 'price' => 'Rp 1.249.000', 'old_price' => 'Rp 1.499.000', 'rating' => '4.8', 'badge' => 'Pilihan', 'image' => 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=900&q=85'],
-            ['name' => 'Tablet Note 11', 'category' => 'Tablet', 'price' => 'Rp 6.299.000', 'old_price' => 'Rp 6.999.000', 'rating' => '4.7', 'badge' => 'Baru', 'image' => 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=900&q=85'],
-            ['name' => 'Wireless Earbuds Air', 'category' => 'Audio', 'price' => 'Rp 1.899.000', 'old_price' => 'Rp 2.299.000', 'rating' => '4.8', 'badge' => 'Hemat 17%', 'image' => 'https://images.unsplash.com/photo-1606220945770-b5b6c2c55bf1?auto=format&fit=crop&w=900&q=85'],
-            ['name' => 'Konsol Game Next', 'category' => 'Gaming', 'price' => 'Rp 7.499.000', 'old_price' => 'Rp 7.999.000', 'rating' => '4.9', 'badge' => 'Terlaris', 'image' => 'https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?auto=format&fit=crop&w=900&q=85'],
-        ];
-    @endphp
-
     <section
         class="mx-auto max-w-7xl px-4 pb-12 pt-6 sm:px-6 sm:pt-8 lg:px-8 lg:pb-16"
         x-data="{
@@ -126,40 +111,41 @@
                 <h2 class="mt-2 text-3xl font-extrabold tracking-tight text-slate-950 sm:text-4xl">Produk terbaru</h2>
                 <p class="mt-2 text-sm text-slate-500 sm:text-base">Upgrade gadget-mu dengan koleksi favorit minggu ini.</p>
             </div>
-            <a href="#produk-terbaru" class="inline-flex w-fit items-center gap-2 text-sm font-bold text-rose-700 transition hover:gap-3 hover:text-rose-800">
+            <a href="{{ route('products.index') }}" class="inline-flex w-fit items-center gap-2 text-sm font-bold text-rose-700 transition hover:gap-3 hover:text-rose-800">
                 Lihat semua produk
                 <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-6-6 6 6-6 6" /></svg>
             </a>
         </div>
 
         <div class="mt-8 grid grid-cols-2 gap-4 sm:gap-5 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-            @foreach ($products as $product)
+            @forelse ($products as $product)
                 <article
                     data-product-card
-                    data-search="{{ strtolower($product['name'].' '.$product['category']) }}"
+                    data-search="{{ strtolower($product->name.' '.($product->category?->name ?? '')) }}"
                     x-show="!searchQuery || $el.dataset.search.includes(searchQuery.toLowerCase())"
                     class="group overflow-hidden rounded-2xl border border-slate-100 bg-white transition duration-300 hover:-translate-y-1 hover:border-rose-100 hover:shadow-xl hover:shadow-slate-900/5"
                 >
                     <div class="relative aspect-square overflow-hidden bg-slate-100">
-                        <img src="{{ $product['image'] }}" alt="{{ $product['name'] }}" loading="lazy" class="size-full object-cover transition duration-500 group-hover:scale-105">
-                        <span class="absolute left-3 top-3 rounded-full bg-white/95 px-2.5 py-1 text-[10px] font-extrabold text-rose-700 shadow-sm sm:text-xs">{{ $product['badge'] }}</span>
-                        <span class="absolute bottom-3 right-3 rounded-full bg-slate-950/75 px-2.5 py-1 text-[10px] font-bold text-white backdrop-blur sm:text-xs">{{ $product['category'] }}</span>
+                        @if ($product->image_path)
+                            <img src="{{ Illuminate\Support\Facades\Storage::disk('public')->url($product->image_path) }}" alt="{{ $product->name }}" loading="lazy" class="size-full object-cover transition duration-500 group-hover:scale-105">
+                        @else
+                            <div class="grid size-full place-items-center text-sm font-semibold text-slate-400">Gambar belum tersedia</div>
+                        @endif
+                        <span class="absolute bottom-3 right-3 rounded-full bg-slate-950/75 px-2.5 py-1 text-[10px] font-bold text-white backdrop-blur sm:text-xs">{{ $product->category?->name ?? 'Tanpa kategori' }}</span>
                     </div>
                     <div class="p-3.5 sm:p-4">
-                        <div class="flex items-center gap-1 text-amber-400" aria-label="Rating {{ $product['rating'] }} dari 5">
-                            <svg class="size-3.5 fill-current" viewBox="0 0 20 20" aria-hidden="true"><path d="m10 1.7 2.55 5.16 5.7.83-4.12 4.02.97 5.68L10 14.71l-5.1 2.68.97-5.68L1.75 7.69l5.7-.83L10 1.7Z" /></svg>
-                            <span class="text-xs font-bold text-slate-600">{{ $product['rating'] }}</span>
-                        </div>
-                        <h3 class="mt-2 min-h-10 text-sm font-bold leading-5 text-slate-800 sm:text-base">{{ $product['name'] }}</h3>
-                        <p class="mt-2 text-sm font-extrabold text-slate-950">{{ $product['price'] }}</p>
-                        <p class="mt-0.5 text-xs text-slate-400 line-through">{{ $product['old_price'] }}</p>
+                        <h3 class="min-h-10 text-sm font-bold leading-5 text-slate-800 sm:text-base">{{ $product->name }}</h3>
+                        <p class="mt-2 text-sm font-extrabold text-slate-950">Rp{{ number_format((float) $product->price, 0, ',', '.') }}</p>
+                        <p class="mt-0.5 text-xs text-slate-500">Stok: {{ $product->stock }}</p>
                         <button type="button" @click="cartCount++" class="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-rose-100 bg-rose-50 px-3 py-2.5 text-xs font-extrabold text-rose-700 transition hover:border-rose-700 hover:bg-rose-700 hover:text-white sm:text-sm">
                             <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4h2l2.2 10.1a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 2-1.6L21 8H6" /><circle cx="10" cy="20" r="1" /><circle cx="18" cy="20" r="1" /></svg>
                             Tambah ke keranjang
                         </button>
                     </div>
                 </article>
-            @endforeach
+            @empty
+                <p class="col-span-full py-12 text-center text-sm text-slate-500">Belum ada produk yang tersedia.</p>
+            @endforelse
         </div>
     </section>
 
