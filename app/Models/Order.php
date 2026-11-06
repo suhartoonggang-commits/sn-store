@@ -25,6 +25,7 @@ class Order extends Model
         'total',
         'payment_status',
         'payment_gateway',
+        'snap_token',
         'payment_reference',
         'paid_at',
     ];

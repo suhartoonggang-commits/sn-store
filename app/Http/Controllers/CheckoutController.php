@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Contracts\PaymentGateway;
 use App\Services\CheckoutService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Throwable;
 
 class CheckoutController extends Controller
 {
@@ -23,8 +25,11 @@ class CheckoutController extends Controller
         ]);
     }
 
-    public function store(Request $request, CheckoutService $checkoutService): RedirectResponse
-    {
+    public function store(
+        Request $request,
+        CheckoutService $checkoutService,
+        PaymentGateway $paymentGateway
+    ): RedirectResponse {
         $customer = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'phone' => ['required', 'string', 'max:30'],
@@ -34,8 +39,24 @@ class CheckoutController extends Controller
 
         $order = $checkoutService->placeOrder($request->user(), $customer);
 
+        try {
+            $payment = $paymentGateway->createSnapPayment($order);
+        } catch (Throwable $exception) {
+            report($exception);
+            $checkoutService->failAndRestore($order);
+
+            return redirect()
+                ->route('cart.index')
+                ->withErrors(['payment' => 'Pembayaran tidak dapat disiapkan. Silakan coba kembali.']);
+        }
+
+        $order->update([
+            'payment_gateway' => 'midtrans',
+            'snap_token' => $payment['token'],
+        ]);
+
         return redirect()
             ->route('orders.show', $order)
-            ->with('status', 'Pesanan berhasil dibuat. Pembayaran menunggu konfigurasi payment gateway.');
+            ->with('status', 'Pesanan berhasil dibuat. Lanjutkan pembayaran melalui Midtrans.');
     }
 }

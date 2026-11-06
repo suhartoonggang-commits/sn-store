@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
@@ -46,7 +47,7 @@ class CheckoutService
                     ]);
                 }
 
-                $subtotal += round((float) $product->price * $cartItem->quantity, 2);
+                $subtotal += (int) round((float) $product->price) * $cartItem->quantity;
             }
 
             $user->update([
@@ -68,12 +69,13 @@ class CheckoutService
 
             foreach ($cartItems as $cartItem) {
                 $product = $products->get($cartItem->product_id);
-                $lineTotal = round((float) $product->price * $cartItem->quantity, 2);
+                $unitPrice = (int) round((float) $product->price);
+                $lineTotal = $unitPrice * $cartItem->quantity;
 
                 $order->items()->create([
                     'product_id' => $product->id,
                     'product_name' => $product->name,
-                    'unit_price' => $product->price,
+                    'unit_price' => $unitPrice,
                     'quantity' => $cartItem->quantity,
                     'line_total' => $lineTotal,
                 ]);
@@ -112,6 +114,66 @@ class CheckoutService
             ]);
 
             return $lockedOrder;
+        });
+    }
+
+    public function failAndRestore(Order $order, ?string $paymentReference = null): void
+    {
+        DB::transaction(function () use ($order, $paymentReference): void {
+            $lockedOrder = Order::query()
+                ->with('items')
+                ->lockForUpdate()
+                ->findOrFail($order->id);
+
+            if ($lockedOrder->payment_status !== Order::PAYMENT_PENDING) {
+                return;
+            }
+
+            foreach ($lockedOrder->items as $item) {
+                if ($item->product_id === null) {
+                    continue;
+                }
+
+                $product = Product::query()
+                    ->lockForUpdate()
+                    ->find($item->product_id);
+
+                if (! $product) {
+                    continue;
+                }
+
+                $product->increment('stock', $item->quantity);
+
+                if ($lockedOrder->user_id === null || ! $product->is_active) {
+                    continue;
+                }
+
+                $cartItem = CartItem::query()
+                    ->where('user_id', $lockedOrder->user_id)
+                    ->where('product_id', $product->id)
+                    ->lockForUpdate()
+                    ->first();
+                $availableStock = $product->stock;
+                $restoredQuantity = min($availableStock, ($cartItem?->quantity ?? 0) + $item->quantity);
+
+                if ($cartItem) {
+                    $cartItem->update(['quantity' => $restoredQuantity]);
+
+                    continue;
+                }
+
+                CartItem::query()->create([
+                    'user_id' => $lockedOrder->user_id,
+                    'product_id' => $product->id,
+                    'quantity' => $restoredQuantity,
+                ]);
+            }
+
+            $lockedOrder->update([
+                'payment_status' => Order::PAYMENT_FAILED,
+                'payment_gateway' => 'midtrans',
+                'payment_reference' => $paymentReference,
+            ]);
         });
     }
 }

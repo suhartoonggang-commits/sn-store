@@ -60,7 +60,7 @@
                     @endforeach
                 </div>
                 <p class="mt-4 flex justify-between text-sm font-extrabold text-slate-900"><span>Total</span><span>Rp{{ number_format($cartItems->sum(fn ($item) => (float) $item->product->price * $item->quantity), 0, ',', '.') }}</span></p>
-                <p class="mt-5 border-l-2 border-amber-400 pl-3 text-xs leading-5 text-slate-600">Order akan dibuat dengan status menunggu pembayaran. Payment gateway belum diaktifkan karena kredensial belum tersedia.</p>
+                <p class="mt-5 border-l-2 border-rose-400 pl-3 text-xs leading-5 text-slate-600">Pembayaran pesanan akan dilanjutkan melalui halaman aman Midtrans.</p>
             </aside>
         </div>
     </section>
