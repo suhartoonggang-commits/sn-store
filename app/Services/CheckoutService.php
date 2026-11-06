@@ -13,7 +13,7 @@ use Illuminate\Validation\ValidationException;
 class CheckoutService
 {
     /**
-     * @param  array{name: string, phone: string, email: string, address: string}  $customer
+    * @param  array{name: string, phone: string, email: string, address: string, province_code: string, province_name: string, city_code: string, city_name: string, district_code: string, district_name: string, village_code: string, village_name: string, postal_code: string, shipping_cost: int, shipping_courier: string, shipping_courier_name: string, shipping_service: string, shipping_etd: string}  $customer
      */
     public function placeOrder(User $user, array $customer): Order
     {
@@ -62,8 +62,22 @@ class CheckoutService
                 'customer_phone' => $customer['phone'],
                 'customer_email' => $customer['email'],
                 'customer_address' => $customer['address'],
+                'province_code' => $customer['province_code'],
+                'province_name' => $customer['province_name'],
+                'city_code' => $customer['city_code'],
+                'city_name' => $customer['city_name'],
+                'district_code' => $customer['district_code'],
+                'district_name' => $customer['district_name'],
+                'village_code' => $customer['village_code'],
+                'village_name' => $customer['village_name'],
+                'postal_code' => $customer['postal_code'],
+                'shipping_cost' => $customer['shipping_cost'],
+                'shipping_courier' => $customer['shipping_courier'],
+                'shipping_courier_name' => $customer['shipping_courier_name'],
+                'shipping_service' => $customer['shipping_service'],
+                'shipping_etd' => $customer['shipping_etd'],
                 'subtotal' => $subtotal,
-                'total' => $subtotal,
+                'total' => $subtotal + $customer['shipping_cost'],
                 'payment_status' => Order::PAYMENT_PENDING,
             ]);
 

@@ -42,6 +42,11 @@
                     <div><dt class="text-slate-500">Nomor HP</dt><dd class="mt-1 font-semibold text-slate-900">{{ $order->customer_phone }}</dd></div>
                     <div><dt class="text-slate-500">Email</dt><dd class="mt-1 font-semibold text-slate-900">{{ $order->customer_email }}</dd></div>
                     <div class="sm:col-span-2"><dt class="text-slate-500">Alamat</dt><dd class="mt-1 whitespace-pre-line font-semibold text-slate-900">{{ $order->customer_address }}</dd></div>
+                    <div><dt class="text-slate-500">Desa/kelurahan</dt><dd class="mt-1 font-semibold text-slate-900">{{ $order->village_name }}</dd></div>
+                    <div><dt class="text-slate-500">Kecamatan</dt><dd class="mt-1 font-semibold text-slate-900">{{ $order->district_name }}</dd></div>
+                    <div><dt class="text-slate-500">Kabupaten/kota</dt><dd class="mt-1 font-semibold text-slate-900">{{ $order->city_name }}</dd></div>
+                    <div><dt class="text-slate-500">Provinsi</dt><dd class="mt-1 font-semibold text-slate-900">{{ $order->province_name }}</dd></div>
+                    <div><dt class="text-slate-500">Kode pos</dt><dd class="mt-1 font-semibold text-slate-900">{{ $order->postal_code }}</dd></div>
                 </dl>
             </div>
 

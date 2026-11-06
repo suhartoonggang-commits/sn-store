@@ -12,12 +12,18 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MidtransNotificationController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RegionController;
+use App\Http\Controllers\ShippingController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/products', [CatalogController::class, 'index'])->name('products.index');
 Route::post('/midtrans/notifications', MidtransNotificationController::class)
     ->name('midtrans.notifications');
+Route::get('/regions/provinces', [RegionController::class, 'provinces'])->name('regions.provinces');
+Route::get('/regions/provinces/{provinceId}/cities', [RegionController::class, 'cities'])->name('regions.cities');
+Route::get('/regions/cities/{cityId}/districts', [RegionController::class, 'districts'])->name('regions.districts');
+Route::get('/regions/districts/{districtId}/villages', [RegionController::class, 'villages'])->name('regions.villages');
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified', 'admin', 'can:dashboard.view'])
@@ -30,6 +36,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/cart/items/{cartItem}', [CartController::class, 'destroy'])->name('cart.items.destroy');
     Route::get('/checkout', [CheckoutController::class, 'create'])->name('checkout.create');
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+    Route::post('/shipping/quotes', [ShippingController::class, 'quotes'])->name('shipping.quotes');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
 });
 

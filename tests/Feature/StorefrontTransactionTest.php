@@ -8,8 +8,42 @@ use App\Models\Product;
 use App\Models\User;
 use App\Services\CheckoutService;
 use App\Services\MidtransPaymentGateway;
+use Illuminate\Support\Facades\DB;
+use Laravolt\Indonesia\Facade as Indonesia;
 
 use function Pest\Laravel\mock;
+
+function createIndonesianRegionHierarchy(): array
+{
+    $provinceId = DB::table('indonesia_provinces')->insertGetId([
+        'code' => '11',
+        'name' => 'Aceh',
+    ]);
+    $cityId = DB::table('indonesia_cities')->insertGetId([
+        'code' => '1101',
+        'province_code' => '11',
+        'name' => 'Kabupaten Aceh Selatan',
+    ]);
+    $districtId = DB::table('indonesia_districts')->insertGetId([
+        'code' => '1101010',
+        'city_code' => '1101',
+        'name' => 'Bakongan',
+    ]);
+    $villageId = DB::table('indonesia_villages')->insertGetId([
+        'code' => '1101010001',
+        'district_code' => '1101010',
+        'name' => 'Keude Bakongan',
+    ]);
+
+    Indonesia::clearCache();
+
+    return [
+        'provinceId' => (string) $provinceId,
+        'cityId' => (string) $cityId,
+        'districtId' => (string) $districtId,
+        'villageId' => (string) $villageId,
+    ];
+}
 
 it('redirects guests to login before they can use the cart', function () {
     $product = Product::factory()->create(['stock' => 3]);
@@ -80,6 +114,8 @@ it('does not allow users to change another users cart item', function () {
 });
 
 it('prefills checkout fields from the authenticated account', function () {
+    createIndonesianRegionHierarchy();
+
     $user = User::factory()->create([
         'name' => 'Nadia Putri',
         'email' => 'nadia@example.test',
@@ -96,10 +132,15 @@ it('prefills checkout fields from the authenticated account', function () {
         ->assertSee('value="Nadia Putri"', false)
         ->assertSee('value="nadia@example.test"', false)
         ->assertSee('value="08123456789"', false)
-        ->assertSee('Jalan Merdeka Nomor 10');
+        ->assertSee('Jalan Merdeka Nomor 10')
+        ->assertSee('name="province_id"', false)
+        ->assertSee('name="postal_code"', false)
+        ->assertSee(':disabled="!provinceId', false);
 });
 
 it('creates a pending order and deducts stock when checkout succeeds', function () {
+    $regions = createIndonesianRegionHierarchy();
+
     mock(PaymentGateway::class)
         ->shouldReceive('createSnapPayment')
         ->once()
@@ -119,6 +160,11 @@ it('creates a pending order and deducts stock when checkout succeeds', function 
         'phone' => '08123456789',
         'email' => 'nadia@example.test',
         'address' => 'Jalan Merdeka Nomor 10, Jakarta',
+        'province_id' => $regions['provinceId'],
+        'city_id' => $regions['cityId'],
+        'district_id' => $regions['districtId'],
+        'village_id' => $regions['villageId'],
+        'postal_code' => '23773',
     ]);
 
     $order = Order::query()->firstOrFail();
@@ -130,6 +176,15 @@ it('creates a pending order and deducts stock when checkout succeeds', function 
         'customer_name' => 'Nadia Putri',
         'customer_phone' => '08123456789',
         'customer_email' => 'nadia@example.test',
+        'province_code' => '11',
+        'province_name' => 'Aceh',
+        'city_code' => '1101',
+        'city_name' => 'Kabupaten Aceh Selatan',
+        'district_code' => '1101010',
+        'district_name' => 'Bakongan',
+        'village_code' => '1101010001',
+        'village_name' => 'Keude Bakongan',
+        'postal_code' => '23773',
         'payment_status' => Order::PAYMENT_PENDING,
         'snap_token' => 'snap-test-token',
         'total' => '1700000.00',
@@ -155,10 +210,14 @@ it('creates a pending order and deducts stock when checkout succeeds', function 
         ->assertViewIs('pages.public.order')
         ->assertSeeText($order->order_number)
         ->assertSeeText('Menunggu pembayaran')
-        ->assertSeeText('Headphone Wireless');
+        ->assertSeeText('Headphone Wireless')
+        ->assertSeeText('Kabupaten Aceh Selatan')
+        ->assertSeeText('23773');
 });
 
 it('keeps the cart and stock when checkout finds insufficient stock', function () {
+    $regions = createIndonesianRegionHierarchy();
+
     $user = User::factory()->create();
     $product = Product::factory()->create(['stock' => 1]);
     $user->cartItems()->create(['product_id' => $product->id, 'quantity' => 2]);
@@ -170,6 +229,11 @@ it('keeps the cart and stock when checkout finds insufficient stock', function (
             'phone' => '08123456789',
             'email' => $user->email,
             'address' => 'Alamat lengkap nomor 10',
+            'province_id' => $regions['provinceId'],
+            'city_id' => $regions['cityId'],
+            'district_id' => $regions['districtId'],
+            'village_id' => $regions['villageId'],
+            'postal_code' => '23773',
         ])
         ->assertSessionHasErrors('cart');
 
@@ -183,6 +247,8 @@ it('keeps the cart and stock when checkout finds insufficient stock', function (
 });
 
 it('restores stock and cart when Midtrans cannot create a Snap payment', function () {
+    $regions = createIndonesianRegionHierarchy();
+
     mock(PaymentGateway::class)
         ->shouldReceive('createSnapPayment')
         ->once()
@@ -198,6 +264,11 @@ it('restores stock and cart when Midtrans cannot create a Snap payment', functio
             'phone' => '08123456789',
             'email' => $user->email,
             'address' => 'Alamat lengkap nomor 10',
+            'province_id' => $regions['provinceId'],
+            'city_id' => $regions['cityId'],
+            'district_id' => $regions['districtId'],
+            'village_id' => $regions['villageId'],
+            'postal_code' => '23773',
         ])
         ->assertRedirect(route('cart.index'))
         ->assertSessionHasErrors('payment');
@@ -380,4 +451,62 @@ it('restores stock and cart when Midtrans confirms an expired payment', function
 
 it('returns a json validation response for malformed Midtrans notifications', function () {
     $this->postJson(route('midtrans.notifications'), [])->assertUnprocessable();
+});
+
+it('returns only children belonging to the selected region', function () {
+    $regions = createIndonesianRegionHierarchy();
+
+    $this->getJson(route('regions.provinces'))
+        ->assertOk()
+        ->assertJsonFragment(['id' => $regions['provinceId'], 'name' => 'Aceh']);
+    $this->getJson(route('regions.cities', $regions['provinceId']))
+        ->assertOk()
+        ->assertJsonCount(1)
+        ->assertJsonFragment(['id' => $regions['cityId'], 'name' => 'Kabupaten Aceh Selatan']);
+    $this->getJson(route('regions.districts', $regions['cityId']))
+        ->assertOk()
+        ->assertJsonFragment(['id' => $regions['districtId'], 'name' => 'Bakongan']);
+    $this->getJson(route('regions.villages', $regions['districtId']))
+        ->assertOk()
+        ->assertJsonFragment(['id' => $regions['villageId'], 'name' => 'Keude Bakongan']);
+});
+
+it('rejects checkout when selected city does not belong to selected province', function () {
+    $regions = createIndonesianRegionHierarchy();
+    DB::table('indonesia_provinces')->insert([
+        'code' => '12',
+        'name' => 'Sumatera Utara',
+    ]);
+    $otherCityId = DB::table('indonesia_cities')->insertGetId([
+        'code' => '1201',
+        'province_code' => '12',
+        'name' => 'Kabupaten Nias',
+    ]);
+    Indonesia::clearCache();
+    $user = User::factory()->create();
+    $product = Product::factory()->create(['stock' => 3]);
+    $user->cartItems()->create(['product_id' => $product->id, 'quantity' => 1]);
+
+    $this->actingAs($user)
+        ->from(route('checkout.create'))
+        ->post(route('checkout.store'), [
+            'name' => $user->name,
+            'phone' => '08123456789',
+            'email' => $user->email,
+            'address' => 'Alamat lengkap nomor 10',
+            'province_id' => $regions['provinceId'],
+            'city_id' => $otherCityId,
+            'district_id' => $regions['districtId'],
+            'village_id' => $regions['villageId'],
+            'postal_code' => '23773',
+        ])
+        ->assertSessionHasErrors('city_id');
+
+    $this->assertDatabaseCount('orders', 0);
+    $this->assertDatabaseHas('products', ['id' => $product->id, 'stock' => 3]);
+    $this->assertDatabaseHas('cart_items', [
+        'user_id' => $user->id,
+        'product_id' => $product->id,
+        'quantity' => 1,
+    ]);
 });

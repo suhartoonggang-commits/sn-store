@@ -23,6 +23,15 @@ class MidtransPaymentGateway implements PaymentGateway
             'name' => mb_substr($item->product_name, 0, 50),
         ])->all();
 
+        if ($order->shipping_cost > 0) {
+            $itemDetails[] = [
+                'id' => 'shipping',
+                'price' => (int) $order->shipping_cost,
+                'quantity' => 1,
+                'name' => mb_substr('Ongkos kirim '.$order->shipping_courier_name.' '.$order->shipping_service, 0, 50),
+            ];
+        }
+
         $nameParts = preg_split('/\s+/', trim($order->customer_name)) ?: [];
         $firstName = array_shift($nameParts) ?: 'Customer';
 

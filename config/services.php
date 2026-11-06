@@ -43,4 +43,14 @@ return [
         'notification_url' => env('MIDTRANS_NOTIFICATION_URL'),
     ],
 
+    'rajaongkir' => [
+        'base_url' => env('RAJAONGKIR_BASE_URL', 'https://rajaongkir.komerce.id/api/v1'),
+        'api_key' => env('RAJAONGKIR_API_KEY'),
+        'origin_province' => env('RAJAONGKIR_ORIGIN_PROVINCE', 'Sulawesi Selatan'),
+        'origin_city' => env('RAJAONGKIR_ORIGIN_CITY', 'Makassar'),
+        'origin_district' => env('RAJAONGKIR_ORIGIN_DISTRICT', 'Makassar'),
+        'default_item_weight_grams' => (int) env('RAJAONGKIR_DEFAULT_ITEM_WEIGHT_GRAMS', 1000),
+        'couriers' => ['jne', 'sicepat', 'jnt', 'tiki', 'pos'],
+    ],
+
 ];
