@@ -35,9 +35,9 @@
                             'text-slate-600 hover:bg-slate-50 hover:text-slate-900' => $selectedCategory,
                         ])>
                             <span>Semua kategori</span>
-                            <span class="text-xs text-slate-400">{{ $categories->sum('products_count') }}</span>
+                            <span class="text-xs text-slate-400">{{ $navigationCategories->sum('products_count') }}</span>
                         </a>
-                        @foreach ($categories as $category)
+                        @foreach ($navigationCategories as $category)
                             <a href="{{ route('products.index', ['category' => $category->slug, 'q' => $searchQuery ?: null]) }}" @class([
                                 'flex shrink-0 items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm transition',
                                 'bg-rose-50 font-bold text-rose-800' => $selectedCategory === $category->slug,
@@ -79,10 +79,25 @@
                                 <h2 class="min-h-10 text-sm font-bold leading-5 text-slate-800 sm:text-base">{{ $product->name }}</h2>
                                 <p class="mt-2 text-sm font-extrabold text-slate-950">Rp{{ number_format((float) $product->price, 0, ',', '.') }}</p>
                                 <p class="mt-1 text-xs text-slate-500">Stok: {{ $product->stock }}</p>
-                                <button type="button" aria-label="Tambah {{ $product->name }} ke keranjang" class="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-rose-700 px-3 py-2.5 text-xs font-bold text-white transition hover:bg-rose-800 sm:text-sm">
-                                    <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4h2l2.2 10.1a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 2-1.6L21 8H6" /><circle cx="10" cy="20" r="1" /><circle cx="18" cy="20" r="1" /></svg>
-                                    Tambah ke keranjang
-                                </button>
+                                @if ($product->stock > 0)
+                                    @auth
+                                        <form method="POST" action="{{ route('cart.items.store', $product) }}" class="mt-4">
+                                            @csrf
+                                            <input type="hidden" name="quantity" value="1">
+                                            <button type="submit" aria-label="Tambah {{ $product->name }} ke keranjang" class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-rose-700 px-3 py-2.5 text-xs font-bold text-white transition hover:bg-rose-800 sm:text-sm">
+                                                <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4h2l2.2 10.1a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 2-1.6L21 8H6" /><circle cx="10" cy="20" r="1" /><circle cx="18" cy="20" r="1" /></svg>
+                                                Tambah ke keranjang
+                                            </button>
+                                        </form>
+                                    @else
+                                        <a href="{{ route('login') }}" class="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-rose-700 px-3 py-2.5 text-xs font-bold text-white transition hover:bg-rose-800 sm:text-sm">
+                                            <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4h2l2.2 10.1a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 2-1.6L21 8H6" /><circle cx="10" cy="20" r="1" /><circle cx="18" cy="20" r="1" /></svg>
+                                            Login untuk membeli
+                                        </a>
+                                    @endauth
+                                @else
+                                    <button type="button" disabled class="mt-4 inline-flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-lg bg-slate-200 px-3 py-2.5 text-xs font-bold text-slate-500 sm:text-sm">Stok habis</button>
+                                @endif
                             </div>
                         </article>
                     @empty

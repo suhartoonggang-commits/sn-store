@@ -34,7 +34,7 @@ it('renders active categories and products from the database', function () {
         ->assertDontSeeText('Kategori Nonaktif')
         ->assertDontSeeText('Produk Nonaktif')
         ->assertDontSeeText('Sony Alpha A6400')
-        ->assertViewHas('categories', fn ($categories) => $categories->count() === 1)
+        ->assertViewHas('navigationCategories', fn ($categories) => $categories->count() === 1)
         ->assertViewHas('products', fn ($products) => $products->count() === 1);
 
     expect(substr_count($response->getContent(), 'data-product-card'))->toBe(1);
@@ -82,7 +82,7 @@ it('filters catalog products by category and search query', function () {
         ->assertSeeText('Headphone Wireless')
         ->assertDontSeeText('Speaker Bluetooth')
         ->assertDontSeeText('Kamera Wireless')
-        ->assertSee('Tambah ke keranjang')
+        ->assertSee('Login untuk membeli')
         ->assertSee('value="wireless"', false)
         ->assertViewHas('products', fn ($products) => $products->total() === 1);
 

@@ -14,7 +14,7 @@
     </head>
     <body
         class="font-sans antialiased text-slate-900"
-        x-data="{ searchQuery: @js(request('q', '')), cartCount: 0, cartOpen: false, mobileMenuOpen: false }"
+        x-data="{ searchQuery: @js(request('q', '')), mobileMenuOpen: false }"
     >
         <div class="bg-rose-800 px-4 py-2 text-center text-xs font-semibold tracking-wide text-white sm:text-sm">
             <span class="hidden sm:inline">PENGIRIMAN GRATIS</span>
@@ -40,7 +40,7 @@
                             <svg class="size-4 transition group-open:rotate-180" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.22 7.47a.75.75 0 0 1 1.06 0L10 11.19l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 8.53a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" /></svg>
                         </summary>
                         <div class="absolute left-0 top-full mt-3 w-52 rounded-2xl border border-slate-100 bg-white p-2 shadow-xl shadow-slate-900/10">
-                            @forelse ($categories as $category)
+                            @forelse ($navigationCategories as $category)
                                 <a href="{{ route('products.index', ['category' => $category->slug]) }}" class="block rounded-xl px-3 py-2.5 transition hover:bg-rose-50 hover:text-rose-700">{{ $category->name }}</a>
                             @empty
                                 <span class="block px-3 py-2.5 text-slate-500">Belum ada kategori</span>
@@ -72,18 +72,9 @@
                         <a href="{{ route('login') }}" class="rounded-full border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:border-rose-200 hover:text-rose-700">Login</a>
                     @endauth
 
-                    <div class="relative">
-                        <button type="button" @click="cartOpen = !cartOpen" :aria-expanded="cartOpen.toString()" aria-label="Buka keranjang belanja" class="relative grid size-10 place-items-center rounded-full bg-slate-100 text-slate-800 transition hover:bg-rose-50 hover:text-rose-700">
-                            <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4h2l2.2 10.1a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 2-1.6L21 8H6" /><circle cx="10" cy="20" r="1" /><circle cx="18" cy="20" r="1" /></svg>
-                            <span x-show="cartCount > 0" x-text="cartCount" class="absolute -right-1 -top-1 grid size-5 place-items-center rounded-full bg-rose-700 text-[10px] font-bold text-white"></span>
-                        </button>
-                        <div x-show="cartOpen" @click.outside="cartOpen = false" x-transition class="absolute right-0 top-full mt-3 w-64 rounded-2xl border border-slate-100 bg-white p-5 shadow-xl shadow-slate-900/10">
-                            <p class="font-bold text-slate-900">Keranjang belanja</p>
-                            <p x-show="cartCount === 0" class="mt-1 text-sm text-slate-500">Keranjangmu masih kosong. Yuk, temukan gadget favoritmu!</p>
-                            <p x-show="cartCount > 0" class="mt-1 text-sm text-slate-500"><span x-text="cartCount"></span> produk siap menemani harimu.</p>
-                            <a href="{{ route('home') }}#produk-terbaru" @click="cartOpen = false" class="mt-4 inline-flex text-sm font-bold text-rose-700 hover:text-rose-800">Lanjut belanja <span aria-hidden="true" class="ml-1">→</span></a>
-                        </div>
-                    </div>
+                    <a href="{{ route('cart.index') }}" aria-label="Buka keranjang belanja" class="grid size-10 place-items-center rounded-full bg-slate-100 text-slate-800 transition hover:bg-rose-50 hover:text-rose-700">
+                        <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4h2l2.2 10.1a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 2-1.6L21 8H6" /><circle cx="10" cy="20" r="1" /><circle cx="18" cy="20" r="1" /></svg>
+                    </a>
 
                     <button type="button" @click="mobileMenuOpen = !mobileMenuOpen" :aria-expanded="mobileMenuOpen.toString()" aria-label="Buka menu navigasi" class="grid size-10 place-items-center rounded-full text-slate-700 transition hover:bg-slate-100 lg:hidden">
                         <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16" /></svg>
@@ -105,7 +96,7 @@
                     <a href="{{ route('home') }}" @click="mobileMenuOpen = false" class="rounded-xl px-3 py-2.5 text-rose-700 hover:bg-rose-50">Beranda</a>
                     <a href="{{ route('products.index') }}" @click="mobileMenuOpen = false" class="rounded-xl px-3 py-2.5 hover:bg-slate-50">Semua produk</a>
                     <p class="px-3 py-2 text-xs font-bold uppercase text-slate-400">Kategori</p>
-                    @forelse ($categories as $category)
+                    @forelse ($navigationCategories as $category)
                         <a href="{{ route('products.index', ['category' => $category->slug]) }}" @click="mobileMenuOpen = false" class="rounded-xl px-3 py-2.5 hover:bg-slate-50">{{ $category->name }}</a>
                     @empty
                         <span class="px-3 py-2.5 text-sm text-slate-500">Belum ada kategori</span>

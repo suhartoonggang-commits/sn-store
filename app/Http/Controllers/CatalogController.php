@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
@@ -18,12 +17,6 @@ class CatalogController extends Controller
         ]);
         $searchQuery = trim($filters['q'] ?? '');
         $categorySlug = $filters['category'] ?? null;
-
-        $categories = Category::query()
-            ->where('is_active', true)
-            ->withCount(['products' => fn (Builder $query) => $query->where('is_active', true)])
-            ->orderBy('name')
-            ->get();
 
         $products = Product::query()
             ->with('category')
@@ -44,7 +37,6 @@ class CatalogController extends Controller
             ->withQueryString();
 
         return view('pages.public.products', [
-            'categories' => $categories,
             'products' => $products,
             'searchQuery' => $searchQuery,
             'selectedCategory' => $categorySlug,
