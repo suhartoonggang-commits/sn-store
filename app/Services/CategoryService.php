@@ -29,6 +29,26 @@ class CategoryService
             ->get();
     }
 
+    /**
+     * @return array<int, array{id: int, nama: string, slug: string, deskripsi: ?string, created_at: ?string, updated_at: ?string}>
+     */
+    public function getPublicCategories(): array
+    {
+        return Category::query()
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get()
+            ->map(fn (Category $category): array => [
+                'id' => $category->id,
+                'nama' => $category->name,
+                'slug' => $category->slug,
+                'deskripsi' => $category->description,
+                'created_at' => $category->created_at?->toISOString(),
+                'updated_at' => $category->updated_at?->toISOString(),
+            ])
+            ->all();
+    }
+
     public function count(): int
     {
         return Category::query()->count();
