@@ -8,7 +8,9 @@ use App\Models\Product;
 use App\Models\User;
 use App\Services\CheckoutService;
 use App\Services\MidtransPaymentGateway;
+use Illuminate\Http\Client\Request as ClientRequest;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Laravolt\Indonesia\Facade as Indonesia;
 
 use function Pest\Laravel\mock;
@@ -43,6 +45,49 @@ function createIndonesianRegionHierarchy(): array
         'districtId' => (string) $districtId,
         'villageId' => (string) $villageId,
     ];
+}
+
+function fakeRajaOngkirShippingApi(int $shippingCost = 25000, bool $connectionFailure = false): void
+{
+    config([
+        'services.rajaongkir.api_key' => 'test-rajaongkir-api-key',
+        'services.rajaongkir.base_url' => 'https://rajaongkir.komerce.id/api/v1',
+        'services.rajaongkir.origin_province' => 'Sulawesi Selatan',
+        'services.rajaongkir.origin_city' => 'Makassar',
+        'services.rajaongkir.origin_district' => 'Makassar',
+    ]);
+
+    Http::preventStrayRequests();
+    Http::fake([
+        'rajaongkir.komerce.id/api/v1/destination/province' => Http::response(['data' => [
+            ['id' => 1, 'name' => 'Sulawesi Selatan'],
+            ['id' => 2, 'name' => 'Aceh'],
+        ]]),
+        'rajaongkir.komerce.id/api/v1/destination/city/1' => Http::response(['data' => [
+            ['id' => 10, 'name' => 'Makassar'],
+        ]]),
+        'rajaongkir.komerce.id/api/v1/destination/district/10' => Http::response(['data' => [
+            ['id' => 100, 'name' => 'Makassar'],
+        ]]),
+        'rajaongkir.komerce.id/api/v1/destination/city/2' => Http::response(['data' => [
+            ['id' => 20, 'name' => 'Aceh Selatan'],
+        ]]),
+        'rajaongkir.komerce.id/api/v1/destination/district/20' => Http::response(['data' => [
+            ['id' => 200, 'name' => 'Bakongan'],
+        ]]),
+        'rajaongkir.komerce.id/api/v1/calculate/district/domestic-cost' => $connectionFailure
+            ? Http::failedConnection()
+            : Http::response(['data' => [[
+                'code' => 'jne',
+                'name' => 'JNE',
+                'costs' => [[
+                    'service' => 'REG',
+                    'description' => 'Layanan Reguler',
+                    'cost' => $shippingCost,
+                    'etd' => '2-3',
+                ]],
+            ]]]),
+    ]);
 }
 
 it('redirects guests to login before they can use the cart', function () {
@@ -138,8 +183,56 @@ it('prefills checkout fields from the authenticated account', function () {
         ->assertSee(':disabled="!provinceId', false);
 });
 
+it('returns RajaOngkir shipping rates from Makassar for the selected destination', function () {
+    $regions = createIndonesianRegionHierarchy();
+    fakeRajaOngkirShippingApi();
+
+    $user = User::factory()->create();
+    $product = Product::factory()->create();
+    $user->cartItems()->create(['product_id' => $product->id, 'quantity' => 2]);
+
+    $this->actingAs($user)
+        ->postJson(route('shipping.quotes'), [
+            'province_id' => $regions['provinceId'],
+            'city_id' => $regions['cityId'],
+            'district_id' => $regions['districtId'],
+            'courier' => 'jne',
+        ])
+        ->assertOk()
+        ->assertJsonPath('rates.0.courier_code', 'jne')
+        ->assertJsonPath('rates.0.service', 'REG')
+        ->assertJsonPath('rates.0.cost', 25000);
+
+    Http::assertSent(fn (ClientRequest $request): bool => $request->method() === 'POST'
+        && $request->url() === 'https://rajaongkir.komerce.id/api/v1/calculate/district/domestic-cost'
+        && $request->hasHeader('key', 'test-rajaongkir-api-key'));
+    Http::assertSent(fn (ClientRequest $request): bool => $request->data() == [
+        'origin' => '100',
+        'destination' => '200',
+        'weight' => '2000',
+        'courier' => 'jne',
+        'price' => 'lowest',
+    ]);
+});
+
+it('returns a controlled error when RajaOngkir is unreachable while checking rates', function () {
+    $regions = createIndonesianRegionHierarchy();
+    fakeRajaOngkirShippingApi(connectionFailure: true);
+
+    $this->actingAs(User::factory()->create())
+        ->postJson(route('shipping.quotes'), [
+            'province_id' => $regions['provinceId'],
+            'city_id' => $regions['cityId'],
+            'district_id' => $regions['districtId'],
+            'courier' => 'jne',
+        ])
+        ->assertUnprocessable()
+        ->assertJsonPath('message', 'Ongkos kirim belum dapat dihitung. Silakan coba kembali.');
+});
+
 it('creates a pending order and deducts stock when checkout succeeds', function () {
     $regions = createIndonesianRegionHierarchy();
+    fakeRajaOngkirShippingApi();
 
     mock(PaymentGateway::class)
         ->shouldReceive('createSnapPayment')
@@ -165,6 +258,9 @@ it('creates a pending order and deducts stock when checkout succeeds', function 
         'district_id' => $regions['districtId'],
         'village_id' => $regions['villageId'],
         'postal_code' => '23773',
+        'shipping_courier' => 'jne',
+        'shipping_service' => 'REG',
+        'shipping_cost' => 1,
     ]);
 
     $order = Order::query()->firstOrFail();
@@ -185,9 +281,12 @@ it('creates a pending order and deducts stock when checkout succeeds', function 
         'village_code' => '1101010001',
         'village_name' => 'Keude Bakongan',
         'postal_code' => '23773',
+        'shipping_cost' => 25000,
+        'shipping_courier' => 'jne',
+        'shipping_service' => 'REG',
         'payment_status' => Order::PAYMENT_PENDING,
         'snap_token' => 'snap-test-token',
-        'total' => '1700000.00',
+        'total' => '1725000.00',
     ]);
     $this->assertDatabaseHas('order_items', [
         'order_id' => $order->id,
@@ -217,6 +316,7 @@ it('creates a pending order and deducts stock when checkout succeeds', function 
 
 it('keeps the cart and stock when checkout finds insufficient stock', function () {
     $regions = createIndonesianRegionHierarchy();
+    fakeRajaOngkirShippingApi();
 
     $user = User::factory()->create();
     $product = Product::factory()->create(['stock' => 1]);
@@ -234,6 +334,8 @@ it('keeps the cart and stock when checkout finds insufficient stock', function (
             'district_id' => $regions['districtId'],
             'village_id' => $regions['villageId'],
             'postal_code' => '23773',
+            'shipping_courier' => 'jne',
+            'shipping_service' => 'REG',
         ])
         ->assertSessionHasErrors('cart');
 
@@ -246,8 +348,44 @@ it('keeps the cart and stock when checkout finds insufficient stock', function (
     ]);
 });
 
+it('keeps the cart when RajaOngkir is unreachable during checkout', function () {
+    $regions = createIndonesianRegionHierarchy();
+    fakeRajaOngkirShippingApi(connectionFailure: true);
+
+    $user = User::factory()->create();
+    $product = Product::factory()->create(['stock' => 3]);
+    $user->cartItems()->create(['product_id' => $product->id, 'quantity' => 1]);
+
+    $this->actingAs($user)
+        ->from(route('checkout.create'))
+        ->post(route('checkout.store'), [
+            'name' => $user->name,
+            'phone' => '08123456789',
+            'email' => $user->email,
+            'address' => 'Alamat lengkap nomor 10',
+            'province_id' => $regions['provinceId'],
+            'city_id' => $regions['cityId'],
+            'district_id' => $regions['districtId'],
+            'village_id' => $regions['villageId'],
+            'postal_code' => '23773',
+            'shipping_courier' => 'jne',
+            'shipping_service' => 'REG',
+        ])
+        ->assertRedirect(route('checkout.create'))
+        ->assertSessionHasErrors('shipping');
+
+    $this->assertDatabaseCount('orders', 0);
+    $this->assertDatabaseHas('products', ['id' => $product->id, 'stock' => 3]);
+    $this->assertDatabaseHas('cart_items', [
+        'user_id' => $user->id,
+        'product_id' => $product->id,
+        'quantity' => 1,
+    ]);
+});
+
 it('restores stock and cart when Midtrans cannot create a Snap payment', function () {
     $regions = createIndonesianRegionHierarchy();
+    fakeRajaOngkirShippingApi();
 
     mock(PaymentGateway::class)
         ->shouldReceive('createSnapPayment')
@@ -269,6 +407,8 @@ it('restores stock and cart when Midtrans cannot create a Snap payment', functio
             'district_id' => $regions['districtId'],
             'village_id' => $regions['villageId'],
             'postal_code' => '23773',
+            'shipping_courier' => 'jne',
+            'shipping_service' => 'REG',
         ])
         ->assertRedirect(route('cart.index'))
         ->assertSessionHasErrors('payment');
@@ -499,6 +639,8 @@ it('rejects checkout when selected city does not belong to selected province', f
             'district_id' => $regions['districtId'],
             'village_id' => $regions['villageId'],
             'postal_code' => '23773',
+            'shipping_courier' => 'jne',
+            'shipping_service' => 'REG',
         ])
         ->assertSessionHasErrors('city_id');
 

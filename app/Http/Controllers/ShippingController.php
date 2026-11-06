@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\RajaOngkirShippingService;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -28,7 +29,7 @@ class ShippingController extends Controller
                 $attributes['district_id'],
                 $attributes['courier'],
             );
-        } catch (RuntimeException $exception) {
+        } catch (ConnectionException|RuntimeException $exception) {
             report($exception);
 
             return response()->json(['message' => 'Ongkos kirim belum dapat dihitung. Silakan coba kembali.'], 422);

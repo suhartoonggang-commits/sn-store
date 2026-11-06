@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Contracts\PaymentGateway;
-use App\Services\RajaOngkirShippingService;
 use App\Services\CheckoutService;
+use App\Services\RajaOngkirShippingService;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -97,7 +98,7 @@ class CheckoutController extends Controller
                 $customer['district_id'],
                 $customer['shipping_courier'],
             );
-        } catch (RuntimeException $exception) {
+        } catch (ConnectionException|RuntimeException $exception) {
             report($exception);
 
             return back()
@@ -145,5 +146,4 @@ class CheckoutController extends Controller
             ->route('orders.show', $order)
             ->with('status', 'Pesanan berhasil dibuat. Lanjutkan pembayaran melalui Midtrans.');
     }
-
 }
