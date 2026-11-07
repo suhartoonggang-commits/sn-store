@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CartItem;
 use App\Models\Product;
+use App\Services\CartService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -12,13 +13,9 @@ use Illuminate\Validation\ValidationException;
 
 class CartController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request, CartService $cartService): View
     {
-        $cartItems = $request->user()
-            ->cartItems()
-            ->with('product')
-            ->orderBy('created_at')
-            ->get();
+        $cartItems = $cartService->getCartItems($request->user());
 
         return view('pages.public.cart', [
             'cartItems' => $cartItems,
@@ -26,50 +23,13 @@ class CartController extends Controller
         ]);
     }
 
-    public function store(Request $request, Product $product): RedirectResponse
+    public function store(Request $request, Product $product, CartService $cartService): RedirectResponse
     {
         $attributes = $request->validate([
             'quantity' => ['sometimes', 'integer', 'min:1'],
         ]);
         $quantity = (int) ($attributes['quantity'] ?? 1);
-        $user = $request->user();
-
-        DB::transaction(function () use ($product, $quantity, $user): void {
-            $lockedProduct = Product::query()
-                ->lockForUpdate()
-                ->findOrFail($product->id);
-
-            if (! $lockedProduct->is_active || $lockedProduct->stock < 1) {
-                throw ValidationException::withMessages([
-                    'product' => 'Produk ini sedang tidak tersedia.',
-                ]);
-            }
-
-            $cartItem = CartItem::query()
-                ->where('user_id', $user->id)
-                ->where('product_id', $lockedProduct->id)
-                ->lockForUpdate()
-                ->first();
-            $newQuantity = ($cartItem?->quantity ?? 0) + $quantity;
-
-            if ($newQuantity > $lockedProduct->stock) {
-                throw ValidationException::withMessages([
-                    'quantity' => 'Jumlah melebihi stok yang tersedia.',
-                ]);
-            }
-
-            if ($cartItem) {
-                $cartItem->update(['quantity' => $newQuantity]);
-
-                return;
-            }
-
-            CartItem::query()->create([
-                'user_id' => $user->id,
-                'product_id' => $lockedProduct->id,
-                'quantity' => $quantity,
-            ]);
-        });
+        $cartService->addProduct($request->user(), $product, $quantity);
 
         return redirect()->route('cart.index')->with('status', 'Produk ditambahkan ke keranjang.');
     }
